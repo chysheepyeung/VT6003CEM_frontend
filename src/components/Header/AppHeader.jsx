@@ -10,6 +10,10 @@ const rightLink = {
   ml: 3,
 };
 
+const initialState = {
+    userInfo: localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem.getItem("userInfo")) : null
+}
+
 function AppHeader() {
   return (
     <div>
