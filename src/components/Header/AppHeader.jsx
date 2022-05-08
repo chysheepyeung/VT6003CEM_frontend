@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useContext, useState, useEffect } from 'react';
+import { Store } from '../Store.jsx';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import AppBar from '../TempComponents/AppBar';
@@ -10,11 +12,18 @@ const rightLink = {
   ml: 3,
 };
 
-const initialState = {
-    userInfo: localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem.getItem("userInfo")) : null
-}
 
 function AppHeader() {
+    const { state, dispatch: ctxDispatch } = useContext(Store);
+    const { userInfo } = state;
+
+    const signoutHandler = (e) => {
+        e.preventDefault();
+        ctxDispatch({type: 'LOGOUT'})
+        localStorage.removeItem('userInfo');
+        window.location.href = '/';
+    };
+
   return (
     <div>
       <AppBar position="fixed">
@@ -29,26 +38,49 @@ function AppHeader() {
           >
             {'The Canine Shelter'}
           </Link>
-          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            <Link
-              color="inherit"
-              variant="h6"
-              underline="none"
-              href="/login/"
-              sx={rightLink}
-            >
-              {'Log In'}
-            </Link>
-            <Link
-              variant="h6"
-              underline="none"
-              href="/register"
-              sx={{ ...rightLink, color: 'secondary.main' }}
-            >
-              {'Register'}
-            </Link>
-          </Box>
-        </Toolbar>
+          
+              {userInfo? (
+                  <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Link
+                            color="inherit"
+                            variant="h6"
+                            underline="none"
+                            href="/login/"
+                            sx={rightLink}
+                            >
+                            {userInfo.fname}
+                        </Link>
+                        <Link
+                            variant="h6"
+                            underline="none"
+                            onClick={signoutHandler}
+                            sx={{ ...rightLink, color: 'secondary.main' }}
+                            >
+                            {'Logout'}
+                        </Link>
+                    </Box>
+                ): (
+                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Link
+                        color="inherit"
+                        variant="h6"
+                        underline="none"
+                        href="/login/"
+                        sx={rightLink}
+                        >
+                        {'Log In'}
+                        </Link>
+                        <Link
+                        variant="h6"
+                        underline="none"
+                        href="/register"
+                        sx={{ ...rightLink, color: 'secondary.main' }}
+                        >
+                        {'Register'}
+                        </Link>
+                </Box>
+              )}
+          </Toolbar>
       </AppBar>
       <Toolbar />
     </div>
@@ -56,3 +88,4 @@ function AppHeader() {
 }
 
 export default AppHeader;
+

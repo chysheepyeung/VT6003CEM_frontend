@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useContext, useState, useEffect } from 'react';
+import { Store } from '../Store.jsx';
 import API from '../api';
 import { Field, Form, FormSpy } from 'react-final-form';
 import Box from '@mui/material/Box';
@@ -20,6 +22,9 @@ function Login() {
   const redirectInUrl = new URLSearchParams(search).get('redirect');
   const redirect = redirectInUrl ? redirectInUrl : '/';
 
+   const { state, dispatch: ctxDispatch } = useContext(Store);
+    const { userInfo } = state;
+
   const validate = (values) => {
     const errors = required(['email', 'password'], values);
 
@@ -33,21 +38,26 @@ function Login() {
     return errors;
   };
 
-    const sleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-    }
+  
 
   async function handleSubmit(values){
     setSent(true);
     try{
-        const response = await API.post('users/signin', values);
+        const response = await API.post('/login', values);
+        ctxDispatch({ type: 'REGISTER', payload: response.data });
         localStorage.setItem("userInfo", JSON.stringify(response.data));
         navigate(redirect || '/');
     }catch(error){
-        setSubmitError(error);
+        setSubmitError(error.response.data.message);
         setSent(false);
     }
   };
+
+    useEffect(() => {
+        if (userInfo) {
+            navigate(redirect);
+        }
+    }, [navigate, redirect, userInfo]);
 
   return (
       <AppForm>

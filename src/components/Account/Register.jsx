@@ -1,4 +1,7 @@
 import * as React from 'react';
+import { useContext, useState, useEffect } from 'react';
+import { Store } from '../Store.jsx';
+import API from '../api';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
@@ -10,9 +13,18 @@ import RFTextField from '../Form/RFTextField';
 import FormButton from '../Form/FormButton';
 import FormFeedback from '../Form/FormFeedback';
 import withRoot from '../withRoot';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function Register() {
   const [sent, setSent] = React.useState(false);
+   const [submitError, setSubmitError] = React.useState(false);
+   const navigate = useNavigate();
+  const {search} = useLocation();
+  const redirectInUrl = new URLSearchParams(search).get('redirect');
+  const redirect = redirectInUrl ? redirectInUrl : '/';
+
+  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const { userInfo } = state;
 
   const validate = (values) => {
     const errors = required(['firstName', 'lastName', 'email', 'password'], values);
@@ -27,9 +39,26 @@ function Register() {
     return errors;
   };
 
-  const handleSubmit = () => {
+  async function handleSubmit(values){
     setSent(true);
+    try{
+        const response = await API.post('/register', values);
+        ctxDispatch({ type: 'REGISTER', payload: response.data });
+        localStorage.setItem("userInfo", JSON.stringify(response.data));
+        navigate(redirect || '/');
+    }catch(error){
+        console.log(error)
+        setSubmitError(error.response.data.message);
+        setSent(false);
+    }
   };
+
+    useEffect(() => {
+        if (userInfo) {
+            console.log(redirect)
+            navigate(redirect);
+        }
+    }, [navigate, redirect, userInfo]);
 
   return (
       <AppForm>
@@ -96,11 +125,11 @@ function Register() {
                 type="password"
                 margin="normal"
               />
-              <FormSpy subscription={{ submitError: true }}>
-                {({ submitError }) =>
+              <FormSpy>
+                {({ submitErrorr }) =>
                   submitError ? (
                     <FormFeedback error sx={{ mt: 2 }}>
-                      {submitError}
+                      {submitError.toString()}
                     </FormFeedback>
                   ) : null
                 }
