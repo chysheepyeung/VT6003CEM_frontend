@@ -46,6 +46,8 @@ function Login() {
         const response = await API.post('/login', values);
         ctxDispatch({ type: 'REGISTER', payload: response.data });
         localStorage.setItem("userInfo", JSON.stringify(response.data));
+        console.log(search)
+        console.log(redirectInUrl)
         navigate(redirect || '/');
     }catch(error){
         setSubmitError(error.response.data.message);

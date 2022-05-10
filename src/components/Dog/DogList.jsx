@@ -73,7 +73,7 @@ const reducer = (state, action) => {
   }
 };
 
-export default function ProductCategories() {
+export default function DogList() {
     const navigate = useNavigate();
     const [{loading, error, dogs}, dispatch] = React.useReducer(reducer, {
         dogs: [],
@@ -93,10 +93,8 @@ export default function ProductCategories() {
                 const response = await API.get('/dogs');
                 if(response){
                     dispatch({type: 'FETCH_DOGS_SUCCESS', payload: response.data})
-                    console.log(dogs)
                 }
             }catch(error){
-                console.log(error)
                 dispatch({type: 'FETCH_DOGS_FAIL', payload: error.message})
             }
         }

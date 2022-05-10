@@ -8,6 +8,8 @@ import Login from './components/Account/Login';
 import Register from './components/Account/Register';
 import AppHeader from './components/Header/AppHeader';
 import AppFooter from './components/Footer/AppFooter';
+import Dog from './components/Dog/DogDetail'
+import DogEdit from './components/Dog/DogEdit'
 import withRoot from './components/withRoot';
 
 const { Header, Content, Footer } = Layout;
@@ -22,6 +24,8 @@ function App() {
                     <Route exact path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/dogs/:dogId" element={<Dog />} />
+                    <Route path="/dogs/:dogId/:type" element={<DogEdit />} />
                 </Routes>
             </Content>
             {/* <AppFooter /> */}
