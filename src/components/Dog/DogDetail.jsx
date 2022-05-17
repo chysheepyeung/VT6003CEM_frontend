@@ -7,6 +7,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -35,6 +36,8 @@ const reducer = (state, action) => {
         return { ...state,  message: action.payload };
     case 'DELETE_DOGDETAIL_FAIL':
         return { ...state,  deleteError: action.payload };
+    case 'CHANGE_FAV':
+        return {...state, isFav: action.payload};
     default:
       return state;
   }
@@ -56,21 +59,24 @@ export default function DogDetail() {
                 }
             );
             if(response){
-                console.log(response)
                 dispatch({type: "DELETE_DOGDETAIL_SUCCESS", payload: response.data.message})
+                setTimeout(() => {
+                        navigate(`/`);
+                 }, 2000);
             }
         }catch(error){
                 dispatch({type: "DELETE_DOGDETAIL_FAIL", payload: getError(error)})
         }
     }
 
-    const [{loading, error, dog, message, deleteError}, dispatch] = 
+    const [{loading, error, dog, message, deleteError, isFav}, dispatch] = 
     React.useReducer(reducer, {
         dog:[],
         loading: true,
         error: '',
         message: '',
-        deleteError: ''
+        deleteError: '',
+        isFav: false
     })
 
     React.useEffect(() => {
@@ -83,18 +89,74 @@ export default function DogDetail() {
                 dispatch({type: "FETCH_DOGDETAIL_FAIL", payload: getError(error)})
             }
         };
+
+        const chkFav = async () =>{
+            try{
+                const response = await API.get(`/fav/${dogId}`,
+                {
+                    headers: {Authorization: `Bearer ${userInfo.token}` }
+                });
+                if(response){
+                    console.log("asd" + response.data.result)
+                    dispatch({type:"CHANGE_FAV", payload: response.data.result})
+                }
+            }catch(error){
+                dispatch({type: "CHANGE_FAV", payload: false})
+            }
+        }
+
+
         fetchData();
+        console.log(isFav)
+        chkFav();
+        console.log(isFav)
     }, [dogId]);
 
     const { state, dispatch: ctxDispatch } = React.useContext(Store);
     const { userInfo } = state;
+    const  addToFav = async (e) => {
+        e.preventDefault();
+        try{
+            const response = await API.post("/fav/",
+            {
+                dogId: dogId
+            },
+            {
+                headers: {Authorization: `Bearer ${userInfo.token}` }
+            })
+            if(response){
+                dispatch({type:"CHANGE_FAV", payload: response.data.result})
+            }
+        }catch(error){
+            dispatch({type: "CHANGE_FAV", payload: false})
+        }
+    }
+
+    const  deleteFromFav = async (e) => {
+        e.preventDefault();
+        try{
+            const response = await API.delete(`/fav/${dogId}`,
+            {
+                headers: {Authorization: `Bearer ${userInfo.token}` }
+            })
+            if(response){
+                dispatch({type:"CHANGE_FAV", payload: response.data.result})
+            }
+        }catch(error){
+            dispatch({type: "CHANGE_FAV", payload: false})
+        }
+    }
 
     return loading ? (
         <LoadingBox />
     ) : message ? (
+        <Container maxWidth="xl" sx={{ mt: 8, mb: 4 }}>
         <AlertBox type="success">{message}</AlertBox>
+        </Container>
     ): error ? (
+        <Container maxWidth="xl" sx={{ mt: 8, mb: 4 }}>
         <AlertBox type="error">{error}</AlertBox>
+        </Container>
     ) : (
         <Container maxWidth="xl" sx={{ mt: 8, mb: 4 }}>
             { deleteError ? (
@@ -110,7 +172,7 @@ export default function DogDetail() {
                                     className="img-large"
                                     width="100%" 
                                     height="100%"
-                                    src={dog.pic}
+                                    src={dog.pic ? dog.pic : "/img/no-image.jpg"}
                                     alt={dog.name}
                                 ></img>
                         </Box>
@@ -135,7 +197,7 @@ export default function DogDetail() {
                                         key="EditDog"
                                         sx={{ py: 0, minHeight: 40, width:"70%", color: 'rgba(0,0,0,.8)' }}
                                         component={Link}
-                                        href={`/dogs/${dogId}/edit`}
+                                        href={`../admin/dogs/${dogId}/edit`}
 
                                     >
                                         <ListItemIcon sx={{ color: 'inherit' }}>
@@ -162,10 +224,25 @@ export default function DogDetail() {
                                     
                                 </Box>
                                 
-                            ) : userInfo ? (
+                            ) : userInfo && isFav ? (
                                 <ListItemButton
                                     key="Favourite"
                                     sx={{ py: 0, minHeight: 40, width:"70%", color: 'rgba(0,0,0,.8)' }}
+                                    onClick={deleteFromFav}
+                                >
+                                    <ListItemIcon sx={{ color: 'inherit' }}>
+                                    <FavoriteIcon sx={{ color: "red" }} />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                    primary="Favourite"
+                                    primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
+                                    />
+                                </ListItemButton>
+                            ) : userInfo && !isFav ? (
+                                <ListItemButton
+                                    key="Favourite"
+                                    sx={{ py: 0, minHeight: 40, width:"70%", color: 'rgba(0,0,0,.8)' }}
+                                    onClick={addToFav}
                                 >
                                     <ListItemIcon sx={{ color: 'inherit' }}>
                                     <FavoriteBorderIcon sx={{ color: "red" }} />

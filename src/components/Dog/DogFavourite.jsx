@@ -101,7 +101,10 @@ export default function DogList() {
         const fetchData = async () => {
             dispatch({type: 'FETCH_DOGS'})
             try{
-                const response = await API.get('/dogs');
+                const response = await API.get('/fav',
+                {
+                    headers: {Authorization: `Bearer ${userInfo.token}` }
+                });
                 if(response){
                     dispatch({type: 'FETCH_DOGS_SUCCESS', payload: response.data})
                 }
@@ -116,36 +119,8 @@ export default function DogList() {
     return  (
         <Container component="section" sx={{ mt: 8, mb: 4 }}>
             <Typography variant="h4" marked="center" align="center" component="h2">
-                For All Dogs
+                My Favourite List
             </Typography>
-            {userInfo && userInfo.isAdmin ? (
-                <ListItemButton
-                key="CreateDog"
-                sx={{ py: 0, minHeight: 40, width:"15%", color: 'rgba(0,0,0,.8)', float:"left" }}
-                onClick={() => {navigate(`admin/dogs/create`)}}
-            >
-                <ListItemIcon sx={{ color: 'inherit' }}>
-                    <CreateIcon sx={{ color: "black" }} />
-                </ListItemIcon>
-                <ListItemText
-                primary="New Dog"
-                primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
-                />
-            </ListItemButton>
-            ) : null}
-            <ListItemButton
-                key="SearchDog"
-                sx={{ py: 0, minHeight: 40, width:"15%", color: 'rgba(0,0,0,.8)', float:"right" }}
-                onClick={() => {navigate(`/search`)}}
-            >
-                <ListItemIcon sx={{ color: 'inherit' }}>
-                    <SearchIcon sx={{ color: "black" }} />
-                </ListItemIcon>
-                <ListItemText
-                primary="Search"
-                primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
-                />
-            </ListItemButton>
             {loading ? (
                 <LoadingBox />
             ) : error ? (
@@ -154,11 +129,11 @@ export default function DogList() {
                 <Box sx={{ mt: 8, display: 'flex', flexWrap: 'wrap' }}>
                 {dogs.map((dog) => (
                     <ImageIconButton
-                        key={dog.name}
+                        key={dog.dog.name}
                         style={{
                             width: "30%",
                         }}
-                        onClick={() => onDogClick(dog._id)}
+                        onClick={() => onDogClick(dog.dog._id)}
                     >
                         <Box
                             sx={{
@@ -169,7 +144,7 @@ export default function DogList() {
                                 bottom: 0,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center 40%',
-                                backgroundImage: dog.pic ? `url(${dog.pic})` : `url(/img/no-image.jpg)`,
+                                backgroundImage: dog.dog.pic ? `url(${dog.dog.pic})` : `url(/img/no-image.jpg)`,
                             }}
                         />
                         <ImageBackdrop className="imageBackdrop" />
@@ -192,7 +167,7 @@ export default function DogList() {
                                 color="inherit"
                                 className="imageTitle"
                             >
-                                {dog.name}
+                                {dog.dog.name}
                                 <div className="imageMarked" />
                             </Typography>
                         </Box>

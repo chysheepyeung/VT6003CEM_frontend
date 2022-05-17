@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import AppBar from '../TempComponents/AppBar';
 import Toolbar from '../TempComponents/Toolbar';
+import AccountMenu from '../TempComponents/AccountMenu.jsx';
 
 const rightLink = {
   fontSize: 16,
@@ -16,13 +17,6 @@ const rightLink = {
 function AppHeader() {
     const { state, dispatch: ctxDispatch } = useContext(Store);
     const { userInfo } = state;
-
-    const signoutHandler = (e) => {
-        e.preventDefault();
-        ctxDispatch({type: 'LOGOUT'})
-        localStorage.removeItem('userInfo');
-        window.location.href = '/';
-    };
 
   return (
     <div>
@@ -39,9 +33,11 @@ function AppHeader() {
             {'The Canine Shelter'}
           </Link>
           
+          
               {userInfo? (
                   <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                        <Link
+                        <AccountMenu />
+                        {/* <Link
                             color="inherit"
                             variant="h6"
                             underline="none"
@@ -49,15 +45,15 @@ function AppHeader() {
                             sx={rightLink}
                             >
                             {userInfo.fname}
-                        </Link>
-                        <Link
+                        </Link> */}
+                        {/* <Link
                             variant="h6"
                             underline="none"
                             onClick={signoutHandler}
                             sx={{ ...rightLink, color: 'secondary.main' }}
                             >
                             {'Logout'}
-                        </Link>
+                        </Link> */}
                     </Box>
                 ): (
                     <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>

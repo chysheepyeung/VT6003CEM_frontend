@@ -19,6 +19,7 @@ import axios from 'axios';
 
 
 
+
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_DOGDETAIL':
@@ -27,18 +28,24 @@ const reducer = (state, action) => {
       return { ...state, dog: action.payload, loading: false };
     case 'FETCH_DOGDETAIL_FAIL':
       return { ...state, loading: false, error: action.payload };
-    case 'DELETE_DOGDETAIL':
-        return { ...state,  message: '', error: '', deleteError: '' };
-    case 'DELETE_DOGDETAIL_SUCCESS':
-        return { ...state,  message: action.payload };
-    case 'DELETE_DOGDETAIL_FAIL':
-        return { ...state,  deleteError: action.payload };
+    case 'NO_NEED_FETCH_DOGDETAIL':
+      return { ...state, loading: false };
+    case 'UPDATE_DOGDETAIL':
+        return { ...state,  message: '', error: '', updateError: '', sent: true };
+    case 'UPDATE_DOGDETAIL_SUCCESS':
+        return { ...state,  message: action.payload, sent: false };
+    case 'UPDATE_DOGDETAIL_FAIL':
+        return { ...state,  updateError: action.payload, sent: false };
     case 'FETCH_BREEDLIST':
         return { ...state,  breedList:[] };
     case 'FETCH_BREEDLIST_SUCCESS':
       return { ...state, breedList: action.payload };
     case 'FETCH_BREEDLIST_FAIL':
       return { ...state, breedList:[] };
+    case 'UPLOAD_IMAGE_SUCCESS':
+      return { ...state, dog: {...state.dog, pic: action.payload.fullPath}};
+    case 'UPLOAD_IMAGE_FAIL':
+      return { ...state, updateError: "Image upload fail, please try again"};
     default:
       return state;
   }
@@ -49,50 +56,75 @@ export default function DogDetail() {
     const params = useParams();
     const { dogId, type } = params;
 
-    const [name, setName] = React.useState('');
-    const [sex, setSex] = React.useState('');
-    const [breed, setBreed] = React.useState('');
+    // const [name, setName] = React.useState('asd');
+    // const [sex, setSex] = React.useState('M');
+    // const [breed, setBreed] = React.useState('');
     const [pic, setPic] = React.useState('');
-    const [age, setAge] = React.useState('');
-    const [intro, setIntro] = React.useState('');
+    // const [age, setAge] = React.useState('');
+    // const [intro, setIntro] = React.useState('');
 
     const validate = (values) => {
-    const errors = required(['name', 'sex', 'breed', 'age'], values);
-    
+    const errors = required(['name', 'sex', 'breed', 'age'], values);   
 
     return errors;
   };
 
-    async function handleSubmit(values){
-        console.log(values)
-    }
 
-    const dogDelete = async (e) => {
-        e.preventDefault();
-        dispatch({type:"DELETE_DOGDETAIL"});
-        try{
-            const response = await API.delete(
-                `/dogs/${dogId}`,
-                {
-                    headers: {Authorization: `Bearer ${userInfo.token}` }
+    async function handleSubmit(values){
+        if(dog.pic){
+           values.pic = dog.pic;
+        }
+        if(type == "edit"){
+            dispatch({type:"UPDATE_DOGDETAIL"});
+            try{
+                const response = await API.post(
+                    `/dogs/${dogId}`,
+                    values,
+                    {
+                        headers: {Authorization: `Bearer ${userInfo.token}` }
+                    }
+                );
+                if(response){
+                    dispatch({type: "UPDATE_DOGDETAIL_SUCCESS", payload: response.data.message});
+                    setTimeout(() => {
+                        navigate(`/dogs/${dogId}`);
+                    }, 2000);
+                    
                 }
-            );
-            if(response){
-                console.log(response)
-                dispatch({type: "DELETE_DOGDETAIL_SUCCESS", payload: response.data.message})
+            }catch(error){
+                    dispatch({type: "UPDATE_DOGDETAIL_FAIL", payload: getError(error)});
             }
-        }catch(error){
-                dispatch({type: "DELETE_DOGDETAIL_FAIL", payload: getError(error)})
+        }else if (type == "create"){
+            dispatch({type:"UPDATE_DOGDETAIL"});
+            try{
+                const response = await API.post(
+                    `/dogs`,
+                    values,
+                    {
+                        headers: {Authorization: `Bearer ${userInfo.token}` }
+                    }
+                );
+                if(response){
+                    console.log(response.data)
+                    dispatch({type: "UPDATE_DOGDETAIL_SUCCESS", payload: response.data.message});
+                    setTimeout(() => {
+                        navigate(`/dogs/${response.data._id}`);
+                    }, 2000);
+                    
+                }
+            }catch(error){
+                    dispatch({type: "UPDATE_DOGDETAIL_FAIL", payload: getError(error)});
+            }
         }
     }
 
-    const [{loading, error, dog, breedList, message, deleteError, sent, submitError}, dispatch] = 
+    const [{loading, error, dog, breedList, message, updateError, sent, submitError}, dispatch] = 
     React.useReducer(reducer, {
         dog:[],
         loading: true,
         error: '',
         message: '',
-        deleteError: '',
+        updateError: '',
         sent: false,
         submitError: false,
         breedList: []
@@ -108,11 +140,16 @@ export default function DogDetail() {
                 dispatch({type: "FETCH_DOGDETAIL_FAIL", payload: getError(error)})
             }
         };
-        fetchData();
+        if(type == "edit"){
+            fetchData();
+        }else if (type == "create"){
+            dispatch({type: "NO_NEED_FETCH_DOGDETAIL"});
+        }
+        
     }, [dogId]);
 
     React.useEffect(() => {
-        const fetchData = async () =>{
+        const fetchBreedList = async () =>{
             dispatch({type: "FETCH_BREEDLIST"});
             try{
                 const response = await axios.get("https://dog.ceo/api/breeds/list/all");
@@ -134,22 +171,46 @@ export default function DogDetail() {
                 dispatch({type: "FETCH_BREEDLIST_FAIL", payload: getError(error)})
             }
         };
-        fetchData();
+        fetchBreedList();
     }, []);
 
     const { state, dispatch: ctxDispatch } = React.useContext(Store);
     const { userInfo } = state;
 
+    const handlePhoto = async (e) =>{
+        try{
+         const formData = new FormData();
+            formData.append('pic', e.target.files[0]);
+            const response = await API.post(
+                    `/image`,
+                    formData,
+                    {
+                        headers: {Authorization: `Bearer ${userInfo.token}` }
+                    }
+            );
+            if (response){
+                 dispatch({type: "UPLOAD_IMAGE_SUCCESS", payload: response.data});
+
+            }
+        }catch(error){
+             dispatch({type: "UPLOAD_IMAGE_FAIL"});
+        }
+    }
+
     return loading ? (
         <LoadingBox />
     ) : message ? (
-        <AlertBox type="success">{message}</AlertBox>
+        <Container maxWidth="xl" sx={{ mt: 8, mb: 4 }}>
+            <AlertBox type="success">{message}</AlertBox>
+        </Container>
     ): error ? (
-        <AlertBox type="error">{error}</AlertBox>
+        <Container maxWidth="xl" sx={{ mt: 8, mb: 4 }}>
+            <AlertBox type="error">{error}</AlertBox>
+        </Container>
     ) : (
         <Container maxWidth="xl" sx={{ mt: 8, mb: 4 }}>
-            { deleteError ? (
-                <AlertBox type="error">{deleteError}</AlertBox>
+            { updateError ? (
+                <AlertBox type="error">{updateError}</AlertBox>
                 ) : null
             }
             
@@ -161,7 +222,7 @@ export default function DogDetail() {
                                     className="img-large"
                                     width="100%" 
                                     height="100%"
-                                    src={dog.pic}
+                                    src={dog.pic ? dog.pic : "/img/no-image.jpg"}
                                     alt={dog.name}
                                 ></img>
                         </Box>
@@ -172,6 +233,8 @@ export default function DogDetail() {
                             onSubmit={handleSubmit}
                             subscription={{ submitting: true }}
                             validate={validate}
+                            initialValues={{ name: dog.name, sex: dog.sex, breed: dog.breed, age: dog.age, intro: dog.intro }}
+                            enctype="multipart/form-data"
                             >
                             {({ handleSubmit: handleSubmit, submitting }) => (
                                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 6 }}>
@@ -244,6 +307,16 @@ export default function DogDetail() {
                                     name="intro"
                                     size="small"
                                 />
+                                
+                                {/* <ImageAudioVideo /> */}
+
+                                <input  
+                                    type="file"
+                                    accept='.png, .jpg, .jepg'
+                                    name='pic'
+                                    onChange={handlePhoto}
+                                />
+
                                 <FormSpy>
                                     {({ submitErrorr }) =>
                                     submitError ? (

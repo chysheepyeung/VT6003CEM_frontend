@@ -10,6 +10,8 @@ import AppHeader from './components/Header/AppHeader';
 import AppFooter from './components/Footer/AppFooter';
 import Dog from './components/Dog/DogDetail'
 import DogEdit from './components/Dog/DogEdit'
+import DogSearch from './components/Dog/DogSearch'
+import DogFavourite from './components/Dog/DogFavourite'
 import withRoot from './components/withRoot';
 
 const { Header, Content, Footer } = Layout;
@@ -25,7 +27,10 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/dogs/:dogId" element={<Dog />} />
-                    <Route path="/dogs/:dogId/:type" element={<DogEdit />} />
+                    <Route path="admin/dogs/:dogId/:type" element={<DogEdit />} />
+                    <Route path="admin/dogs/:type" element={<DogEdit />} />
+                    <Route path="/search" element={<DogSearch />} />
+                    <Route path="/favourite" element={<DogFavourite />} />
                 </Routes>
             </Content>
             {/* <AppFooter /> */}

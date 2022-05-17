@@ -125,6 +125,14 @@ function Register() {
                 type="password"
                 margin="normal"
               />
+              <Field
+                fullWidth
+                component={RFTextField}
+                disabled={submitting || sent}
+                name="registerCode"
+                label="Admin Register Code"
+                margin="normal"
+              />
               <FormSpy>
                 {({ submitErrorr }) =>
                   submitError ? (
