@@ -312,7 +312,7 @@ export default function DogDetail() {
 
                                 <input  
                                     type="file"
-                                    accept='.png, .jpg, .jepg'
+                                    accept='.png, .jpg, .jpeg'
                                     name='pic'
                                     onChange={handlePhoto}
                                 />
