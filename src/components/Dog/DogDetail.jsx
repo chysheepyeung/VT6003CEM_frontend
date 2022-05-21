@@ -19,6 +19,7 @@ import AlertBox from '../TempComponents/AlertBox'
 import { getError } from '../../utils'
 import { Store } from '../Store';
 import Link from '@mui/material/Link';
+import MessageDialog from '../TempComponents/MessageDialog'
 
 
 
@@ -107,9 +108,7 @@ export default function DogDetail() {
 
 
         fetchData();
-        console.log(isFav)
         chkFav();
-        console.log(isFav)
     }, [dogId]);
 
     const { state, dispatch: ctxDispatch } = React.useContext(Store);
@@ -225,33 +224,39 @@ export default function DogDetail() {
                                 </Box>
                                 
                             ) : userInfo && isFav ? (
-                                <ListItemButton
-                                    key="Favourite"
-                                    sx={{ py: 0, minHeight: 40, width:"70%", color: 'rgba(0,0,0,.8)' }}
-                                    onClick={deleteFromFav}
-                                >
-                                    <ListItemIcon sx={{ color: 'inherit' }}>
-                                    <FavoriteIcon sx={{ color: "red" }} />
-                                    </ListItemIcon>
-                                    <ListItemText
-                                    primary="Favourite"
-                                    primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
-                                    />
-                                </ListItemButton>
+                                <Box>
+                                    <ListItemButton
+                                        key="Favourite"
+                                        sx={{ py: 0, minHeight: 40, width:"70%", color: 'rgba(0,0,0,.8)' }}
+                                        onClick={deleteFromFav}
+                                    >
+                                        <ListItemIcon sx={{ color: 'inherit' }}>
+                                        <FavoriteIcon sx={{ color: "red" }} />
+                                        </ListItemIcon>
+                                        <ListItemText
+                                        primary="Favourite"
+                                        primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
+                                        />
+                                    </ListItemButton>
+                                    <MessageDialog type="send" />
+                                </Box>
                             ) : userInfo && !isFav ? (
-                                <ListItemButton
-                                    key="Favourite"
-                                    sx={{ py: 0, minHeight: 40, width:"70%", color: 'rgba(0,0,0,.8)' }}
-                                    onClick={addToFav}
-                                >
-                                    <ListItemIcon sx={{ color: 'inherit' }}>
-                                    <FavoriteBorderIcon sx={{ color: "red" }} />
-                                    </ListItemIcon>
-                                    <ListItemText
-                                    primary="Add to Favourite"
-                                    primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
-                                    />
-                                </ListItemButton>
+                                <Box>
+                                    <ListItemButton
+                                        key="Favourite"
+                                        sx={{ py: 0, minHeight: 40, width:"70%", color: 'rgba(0,0,0,.8)' }}
+                                        onClick={addToFav}
+                                    >
+                                        <ListItemIcon sx={{ color: 'inherit' }}>
+                                        <FavoriteBorderIcon sx={{ color: "red" }} />
+                                        </ListItemIcon>
+                                        <ListItemText
+                                        primary="Add to Favourite"
+                                        primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
+                                        />
+                                    </ListItemButton>
+                                    <MessageDialog type="send"/>
+                                </Box>
                             ) : (
                                 <ListItem>If you have interest, please&nbsp;<Link href={`/login?redirect=/dogs/${dogId}`}>login</Link></ListItem>
                             )                            

@@ -15,6 +15,7 @@ import { Store } from '../Store.jsx';
 import Link from '@mui/material/Link';
 import { useLocation, useNavigate } from 'react-router-dom';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import MessageIcon from '@mui/icons-material/Message';
 
 export default function AccountMenu() {
     const { state, dispatch: ctxDispatch } = React.useContext(Store);
@@ -94,11 +95,19 @@ export default function AccountMenu() {
             <MenuItem  onClick={() => {navigate('/favourite')}} >
             <ListItemIcon><FavoriteIcon sx={{ color: "red" }}/></ListItemIcon> My Favourite List
             </MenuItem>
+            <MenuItem  onClick={() => {navigate('/message')}} >
+            <ListItemIcon><MessageIcon sx={{ color: "black" }}/></ListItemIcon> Message
+            </MenuItem>
             <Divider />
             </Box>
-        ) : null} 
-        
-        
+        ) : (
+            <Box>
+            <MenuItem  onClick={() => {navigate('/message')}} >
+            <ListItemIcon><MessageIcon sx={{ color: "black" }}/></ListItemIcon> Message
+            </MenuItem>
+            <Divider />
+            </Box>
+        ) } 
         
         <MenuItem onClick={signoutHandler}>
           <ListItemIcon>

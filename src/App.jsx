@@ -12,6 +12,7 @@ import Dog from './components/Dog/DogDetail'
 import DogEdit from './components/Dog/DogEdit'
 import DogSearch from './components/Dog/DogSearch'
 import DogFavourite from './components/Dog/DogFavourite'
+import MessageList from './components/Message/MessageList'
 import withRoot from './components/withRoot';
 
 const { Header, Content, Footer } = Layout;
@@ -31,6 +32,7 @@ function App() {
                     <Route path="admin/dogs/:type" element={<DogEdit />} />
                     <Route path="/search" element={<DogSearch />} />
                     <Route path="/favourite" element={<DogFavourite />} />
+                    <Route path="/message" element={<MessageList />} />
                 </Routes>
             </Content>
             {/* <AppFooter /> */}
