@@ -20,7 +20,7 @@ And if any of users want to adopt dogs, it can be send message to the charities 
 $ npm install
 
 # build the app and run in dev mode
-$ yarn run dev
+$ npm run dev
 
 ```
 
