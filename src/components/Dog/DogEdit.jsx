@@ -105,7 +105,6 @@ export default function DogDetail() {
                     }
                 );
                 if(response){
-                    console.log(response.data)
                     dispatch({type: "UPDATE_DOGDETAIL_SUCCESS", payload: response.data.message});
                     setTimeout(() => {
                         navigate(`/dogs/${response.data._id}`);

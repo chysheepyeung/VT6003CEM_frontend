@@ -47,7 +47,6 @@ function Register() {
         localStorage.setItem("userInfo", JSON.stringify(response.data));
         navigate(redirect || '/');
     }catch(error){
-        console.log(error)
         setSubmitError(error.response.data.message);
         setSent(false);
     }
@@ -55,7 +54,6 @@ function Register() {
 
     useEffect(() => {
         if (userInfo) {
-            console.log(redirect)
             navigate(redirect);
         }
     }, [navigate, redirect, userInfo]);

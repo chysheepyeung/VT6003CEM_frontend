@@ -69,7 +69,6 @@ export default function MessageList() {
                 });
                 if(response){
                     dispatch({type: 'FETCH_MSG_SUCCESS', payload: response.data})
-                    console.log(response.data)
                 }
             }catch(error){
                 dispatch({type: 'FETCH_MSG_FAIL', payload: "No Message Yet"})

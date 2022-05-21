@@ -98,7 +98,6 @@ export default function DogDetail() {
                     headers: {Authorization: `Bearer ${userInfo.token}` }
                 });
                 if(response){
-                    console.log("asd" + response.data.result)
                     dispatch({type:"CHANGE_FAV", payload: response.data.result})
                 }
             }catch(error){
