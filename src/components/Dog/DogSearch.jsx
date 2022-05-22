@@ -194,6 +194,9 @@ export default function DogList() {
                                                 select
                                                 margin="normal"
                                             >
+                                                <MenuItem key="" value="">
+                                                    All
+                                                </MenuItem>
                                                 <MenuItem key="Male" value="M">
                                                     Male
                                                 </MenuItem>
@@ -213,6 +216,9 @@ export default function DogList() {
                                             select
                                             size="small"
                                         >
+                                            <MenuItem key="" value="">
+                                                    All
+                                                </MenuItem>
                                             { breedList.map((breed) =>(
                                                 <MenuItem key={breed.value} value={breed.value}>
                                                     {breed.name}
